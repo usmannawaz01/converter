@@ -76,10 +76,13 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+# Paste & Convert
 st.write("Paste your text below:")
 input_text = st.text_area("Input Text", height=200, key="input_text_area")
 if st.button("Submit", key="submit_button"):
-    if db != "Cyrillomethodiana":
+    if not input_text.strip():
+        st.warning("Please paste text to process.")
+    elif db != "Cyrillomethodiana":
         st.info("Work in progress for the selected database.")
     else:
         st.write("Processed Text:")
@@ -87,8 +90,9 @@ if st.button("Submit", key="submit_button"):
 
 st.markdown("---")
 
+# Folder-style Processing via Multi-File Uploader
 st.write("Convert an entire folder of text files (select all .txt files at once):")
-
+st.write("*(In the file dialog, select all the `.txt` files in your folder at once.)*")
 uploaded_files = st.file_uploader(
     "Select .txt files", 
     type="txt", 
