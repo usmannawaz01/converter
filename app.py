@@ -67,7 +67,7 @@ st.set_page_config(layout="wide", page_title="PUA Handling System for OCS")
 st.title("PUA Handling System for Old Church Slavonic")
 
 st.write("Please select your desired option to convert text:")
-db = st.selectbox("", ["Cyrillomethodiana", "database 2", "database 3"])
+db = st.selectbox("", ["Cyrillomethodiana", "database 2", "database 3"], key="db_select")
 
 st.markdown(
     "<div style='font-weight:bold; font-size:16px;'>"
@@ -76,30 +76,33 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-
 st.write("Paste your text below:")
-input_text = st.text_area("", height=200)
-if st.button("Submit"):
+input_text = st.text_area("Input Text", height=200, key="input_text_area")
+if st.button("Submit", key="submit_button"):
     if db != "Cyrillomethodiana":
         st.info("Work in progress for the selected database.")
     else:
         st.write("Processed Text:")
-        st.text_area("", mapping_table(input_text), height=200)
+        st.text_area("Output Text", mapping_table(input_text), height=200, key="output_text_area")
 
 st.markdown("---")
 
- 
-st.write("Convert an entire folder of text files:")
-st.write("*(In the file dialog, select all the `.txt` files in your folder at once.)*")
-uploaded_files = st.file_uploader("", type="txt", accept_multiple_files=True)
+st.write("Convert an entire folder of text files (select all .txt files at once):")
 
-if st.button("Select Folder and Process"):
+uploaded_files = st.file_uploader(
+    "Select .txt files", 
+    type="txt", 
+    accept_multiple_files=True, 
+    key="file_uploader"
+)
+
+if st.button("Select Folder and Process", key="folder_process_button"):
     if db != "Cyrillomethodiana":
         st.info("Work in progress for the selected database.")
     elif not uploaded_files:
         st.warning("Please select one or more .txt files.")
     else:
-        for f in uploaded_files:
+        for idx, f in enumerate(uploaded_files):
             text = f.read().decode("utf-8")
             mapped = mapping_table(text)
             st.write(f"**{f.name}**")
@@ -107,5 +110,6 @@ if st.button("Select Folder and Process"):
                 label="Download Processed File",
                 data=mapped,
                 file_name=f.name,
-                mime="text/plain"
+                mime="text/plain",
+                key=f"download_{idx}"
             )
