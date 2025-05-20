@@ -76,7 +76,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# — Paste & Convert —
+
 st.write("Paste your text below:")
 input_text = st.text_area("", height=200)
 if st.button("Submit"):
@@ -88,7 +88,7 @@ if st.button("Submit"):
 
 st.markdown("---")
 
-# — Folder-style Processing via Multi-File Uploader —
+ 
 st.write("Convert an entire folder of text files:")
 st.write("*(In the file dialog, select all the `.txt` files in your folder at once.)*")
 uploaded_files = st.file_uploader("", type="txt", accept_multiple_files=True)
