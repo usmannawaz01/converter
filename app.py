@@ -1,10 +1,9 @@
+# app.py
 import streamlit as st
 import os
 import glob
-import zipfile
-import io
 
-# ——— Your mapping logic unchanged ———
+
 def mapping_table(text):
     replacements = {
         '': 'и',
@@ -68,8 +67,10 @@ def mapping_table(text):
     return text
 
 def process_folder(input_folder: str, output_folder: str):
+    """Batch‐convert all .txt in input_folder → output_folder"""
     os.makedirs(output_folder, exist_ok=True)
-    for in_path in glob.glob(os.path.join(input_folder, '*.txt')):
+    txt_files = glob.glob(os.path.join(input_folder, '*.txt'))
+    for in_path in txt_files:
         with open(in_path, 'r', encoding='utf-8') as f:
             content = f.read()
         mapped = mapping_table(content)
@@ -77,7 +78,7 @@ def process_folder(input_folder: str, output_folder: str):
         with open(out_path, 'w', encoding='utf-8') as f:
             f.write(mapped)
 
-# ——— UI ———
+
 st.set_page_config(layout="wide", page_title="PUA Handling System")
 
 st.title("PUA Handling System for Old Church Slavonic")
@@ -92,9 +93,9 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+
 st.write("Paste your text below:")
 input_text = st.text_area("", height=200)
-
 if st.button("Submit"):
     if db != "Cyrillomethodiana":
         st.info("Work in progress for the selected database.")
@@ -102,21 +103,22 @@ if st.button("Submit"):
         st.write("Processed Text:")
         st.text_area("", mapping_table(input_text), height=200)
 
+
+st.markdown("---")
 st.write("Convert an entire folder of text files:")
-# We use a ZIP upload in lieu of folder selection
-uploaded_zip = st.file_uploader("", type="zip")
+
+input_folder = st.text_input("Input folder path (e.g. C:/data/ocs_txt)")
+output_folder = st.text_input("Output folder path (e.g. C:/data/ocs_txt_mapped)")
+
 if st.button("Select Folder and Process"):
     if db != "Cyrillomethodiana":
         st.info("Work in progress for the selected database.")
-    elif uploaded_zip is None:
-        st.warning("Please upload a ZIP file of .txt files.")
     else:
-        z = zipfile.ZipFile(uploaded_zip)
-        out_io = io.BytesIO()
-        with zipfile.ZipFile(out_io, "w") as out_zip:
-            for name in z.namelist():
-                if name.lower().endswith(".txt"):
-                    txt = z.read(name).decode("utf-8")
-                    out_zip.writestr(name, mapping_table(txt))
-        st.success("Files processed.")
-        st.download_button("Download Processed ZIP", out_io.getvalue(), file_name="processed.zip")
+        if not (input_folder and output_folder):
+            st.warning("Please specify both input and output folder paths.")
+        else:
+            try:
+                process_folder(input_folder, output_folder)
+                st.success(f"Files have been processed and saved to: {output_folder}")
+            except Exception as e:
+                st.error(f"An error occurred: {e}")
