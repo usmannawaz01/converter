@@ -76,7 +76,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Paste & Convert
+
 st.write("Paste your text below:")
 input_text = st.text_area("Input Text", height=200, key="input_text_area")
 if st.button("Submit", key="submit_button"):
